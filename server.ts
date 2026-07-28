@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import path from "path";
 import { createClient } from "@libsql/client";
-import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -15,7 +14,10 @@ const JWT_SECRET = process.env.JWT_SECRET || "super-secret-key-for-dev";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
 // Create LibSQL client
-const dbUrl = process.env.TURSO_DATABASE_URL || "file:local.db";
+let dbUrl = process.env.TURSO_DATABASE_URL || "file:local.db";
+if (process.env.VERCEL && !process.env.TURSO_DATABASE_URL) {
+  dbUrl = "file:/tmp/local.db";
+}
 const db = createClient({
   url: dbUrl,
   authToken: process.env.TURSO_AUTH_TOKEN,
@@ -78,6 +80,9 @@ async function initDb() {
       PRIMARY KEY (year, metric_key)
     );
   `);
+}
+if (process.env.VERCEL) {
+  initDb().catch(console.error);
 }
 
 // Authentication Middleware
@@ -543,6 +548,7 @@ async function startServer() {
   await initDb();
   
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
