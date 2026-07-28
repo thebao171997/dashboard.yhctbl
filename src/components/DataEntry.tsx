@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Department, METRIC_LABELS, METRIC_GROUPS } from '../types';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, parseISO } from 'date-fns';
 import { Save, AlertTriangle, Edit3, Trash2, X } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 type PeriodType = 'week' | 'month' | 'quarter' | 'custom';
 type TabMode = 'department' | 'target';
@@ -259,8 +261,8 @@ export default function DataEntry() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
           <h3 className="text-xl font-bold text-slate-800 mb-6">Nhập & Chỉnh sửa Số Liệu Báo Cáo</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 items-end">
-          <div>
+        <div className={`grid grid-cols-1 gap-6 mb-8 items-end ${periodType === 'custom' ? 'lg:grid-cols-4 md:grid-cols-2' : 'md:grid-cols-3'}`}>
+          <div className={`${periodType === 'custom' ? 'lg:col-span-1' : ''}`}>
             <label className="block text-sm font-medium text-slate-700 mb-2">Chọn khoa</label>
             <select
               value={selectedDeptId}
@@ -274,7 +276,7 @@ export default function DataEntry() {
             </select>
           </div>
           
-          <div>
+          <div className={`${periodType === 'custom' ? 'lg:col-span-1' : ''}`}>
             <label className="block text-sm font-medium text-slate-700 mb-2">Kỳ báo cáo</label>
             <select
               value={periodType}
@@ -302,39 +304,101 @@ export default function DataEntry() {
             </select>
           </div>
 
-          <div className="md:col-span-1">
+          <div className={`${periodType === 'custom' ? 'lg:col-span-2 md:col-span-2' : ''}`}>
             {periodType === 'custom' ? (
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <div className="flex-1">
                    <label className="block text-xs font-medium text-slate-500 mb-1">Từ ngày</label>
-                   <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} className="w-full border border-slate-200 rounded-xl px-3 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+                   <DatePicker
+                     selected={customStart ? new Date(customStart) : null}
+                     onChange={(date: Date | null) => setCustomStart(date ? format(date, 'yyyy-MM-dd') : '')}
+                     dateFormat="dd/MM/yyyy"
+                     showYearDropdown
+                     showMonthDropdown
+                     dropdownMode="select"
+                     className="w-full border border-slate-200 rounded-xl px-2 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
+                     placeholderText="dd/mm/yyyy"
+                   />
                 </div>
                 <div className="flex-1">
                    <label className="block text-xs font-medium text-slate-500 mb-1">Đến ngày</label>
-                   <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} className="w-full border border-slate-200 rounded-xl px-3 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+                   <DatePicker
+                     selected={customEnd ? new Date(customEnd) : null}
+                     onChange={(date: Date | null) => setCustomEnd(date ? format(date, 'yyyy-MM-dd') : '')}
+                     dateFormat="dd/MM/yyyy"
+                     showYearDropdown
+                     showMonthDropdown
+                     dropdownMode="select"
+                     className="w-full border border-slate-200 rounded-xl px-2 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
+                     placeholderText="dd/mm/yyyy"
+                   />
                 </div>
               </div>
             ) : (
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Chọn thời gian</label>
                 {periodType === 'month' && (
-                  <input type="month" value={dateStr} onChange={e => setDateStr(e.target.value)} className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+                  <div className="flex gap-2">
+                    <select 
+                      value={dateStr.split('-')[1] || new Date().getMonth() + 1}
+                      onChange={e => {
+                        const year = dateStr.split('-')[0] || new Date().getFullYear();
+                        const month = e.target.value.toString().padStart(2, '0');
+                        setDateStr(`${year}-${month}`);
+                      }}
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    >
+                      {Array.from({ length: 12 }).map((_, i) => (
+                        <option key={i + 1} value={(i + 1).toString().padStart(2, '0')}>Tháng {i + 1}</option>
+                      ))}
+                    </select>
+                    <select
+                      value={dateStr.split('-')[0] || new Date().getFullYear()}
+                      onChange={e => {
+                        const month = dateStr.split('-')[1] || (new Date().getMonth() + 1).toString().padStart(2, '0');
+                        setDateStr(`${e.target.value}-${month}`);
+                      }}
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    >
+                      {Array.from({ length: 10 }).map((_, i) => {
+                        const year = new Date().getFullYear() - 5 + i;
+                        return <option key={year} value={year}>Năm {year}</option>;
+                      })}
+                    </select>
+                  </div>
                 )}
                 {periodType === 'week' && (
                   <input type="week" value={dateStr} onChange={e => setDateStr(e.target.value)} className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                 )}
                 {periodType === 'quarter' && (
-                  <select value={dateStr} onChange={e => setDateStr(e.target.value)} className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                    <option value="">-- Chọn quý --</option>
-                    <option value="2023-Q1">Qúy 1/2023</option>
-                    <option value="2023-Q2">Qúy 2/2023</option>
-                    <option value="2023-Q3">Qúy 3/2023</option>
-                    <option value="2023-Q4">Qúy 4/2023</option>
-                    <option value="2024-Q1">Qúy 1/2024</option>
-                    <option value="2024-Q2">Qúy 2/2024</option>
-                    <option value="2024-Q3">Qúy 3/2024</option>
-                    <option value="2024-Q4">Qúy 4/2024</option>
-                  </select>
+                  <div className="flex gap-2">
+                    <select 
+                      value={dateStr.split('-')[1] || 'Q1'}
+                      onChange={e => {
+                        const year = dateStr.split('-')[0] || new Date().getFullYear();
+                        setDateStr(`${year}-${e.target.value}`);
+                      }}
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    >
+                      <option value="Q1">Quý 1</option>
+                      <option value="Q2">Quý 2</option>
+                      <option value="Q3">Quý 3</option>
+                      <option value="Q4">Quý 4</option>
+                    </select>
+                    <select
+                      value={dateStr.split('-')[0] || new Date().getFullYear()}
+                      onChange={e => {
+                        const quarter = dateStr.split('-')[1] || 'Q1';
+                        setDateStr(`${e.target.value}-${quarter}`);
+                      }}
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    >
+                      {Array.from({ length: 10 }).map((_, i) => {
+                        const year = new Date().getFullYear() - 5 + i;
+                        return <option key={year} value={year}>Năm {year}</option>;
+                      })}
+                    </select>
+                  </div>
                 )}
               </div>
             )}

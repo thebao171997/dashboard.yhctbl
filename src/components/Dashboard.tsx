@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { DashboardDeptData, HospitalTarget, METRIC_LABELS, PERSONNEL_GROUPS, PERSONNEL_LABELS, PersonnelKey } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
-import { Activity, Users, BedDouble, Stethoscope, Trophy, BarChart as BarChartIcon, X, Filter, List, Download } from 'lucide-react';
+import { Activity, Users, BedDouble, Stethoscope, Trophy, BarChart as BarChartIcon, X, Filter, List, Download, ChevronDown, ChevronUp } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import clsx from 'clsx';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 
 export default function Dashboard() {
   const [data, setData] = useState<DashboardDeptData[]>([]);
@@ -15,6 +18,7 @@ export default function Dashboard() {
   const [showDeptDataModal, setShowDeptDataModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [selectedDeptForModal, setSelectedDeptForModal] = useState<DashboardDeptData | null>(null);
+  const [expandedPersonnel, setExpandedPersonnel] = useState<Record<string, boolean>>({});
   
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -294,20 +298,28 @@ export default function Dashboard() {
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Từ ngày</label>
-            <input 
-              type="date" 
-              value={startDate} 
-              onChange={e => setStartDate(e.target.value)} 
-              className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" 
+            <DatePicker
+              selected={startDate ? new Date(startDate) : null}
+              onChange={(date: Date | null) => setStartDate(date ? format(date, 'yyyy-MM-dd') : '')}
+              dateFormat="dd/MM/yyyy"
+              showYearDropdown
+              showMonthDropdown
+              dropdownMode="select"
+              className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 w-full"
+              placeholderText="dd/mm/yyyy"
             />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Đến ngày</label>
-            <input 
-              type="date" 
-              value={endDate} 
-              onChange={e => setEndDate(e.target.value)} 
-              className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" 
+            <DatePicker
+              selected={endDate ? new Date(endDate) : null}
+              onChange={(date: Date | null) => setEndDate(date ? format(date, 'yyyy-MM-dd') : '')}
+              dateFormat="dd/MM/yyyy"
+              showYearDropdown
+              showMonthDropdown
+              dropdownMode="select"
+              className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 w-full"
+              placeholderText="dd/mm/yyyy"
             />
           </div>
           <button 
@@ -607,21 +619,32 @@ export default function Dashboard() {
               const groupTotal = group.keys.reduce((sum, key) => sum + (totalPersonnel[key] || 0), 0);
               return (
               <div key={group.title}>
-                <div className="flex items-center justify-between border-b border-slate-100 mb-3 pb-2">
+                <div 
+                  className="flex items-center justify-between border-b border-slate-100 mb-2 pb-2 cursor-pointer hover:bg-slate-50 transition-colors rounded-lg px-2 -mx-2"
+                  onClick={() => setExpandedPersonnel(prev => ({ ...prev, [group.title]: !prev[group.title] }))}
+                >
                   <h4 className="text-sm font-semibold text-slate-600 uppercase tracking-wider">{group.title}</h4>
-                  <span className="text-sm font-bold text-slate-700">Tổng: {groupTotal}</span>
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-bold text-slate-700">Tổng: {groupTotal}</span>
+                    <button className="flex items-center text-xs text-cyan-600 font-medium whitespace-nowrap w-24 justify-end">
+                      {expandedPersonnel[group.title] ? 'Ẩn chi tiết' : 'Chi tiết'}
+                      {expandedPersonnel[group.title] ? <ChevronUp size={16} className="ml-1" /> : <ChevronDown size={16} className="ml-1" />}
+                    </button>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                  {group.keys.map(key => {
-                    const val = totalPersonnel[key] || 0;
-                    return (
-                      <div key={key} className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
-                        <span className="block text-xs font-medium text-slate-500 mb-1">{PERSONNEL_LABELS[key]}</span>
-                        <span className="block text-lg font-bold text-slate-800">{val}</span>
-                      </div>
-                    );
-                  })}
-                </div>
+                {expandedPersonnel[group.title] && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-3 mb-4">
+                    {group.keys.map(key => {
+                      const val = totalPersonnel[key] || 0;
+                      return (
+                        <div key={key} className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                          <span className="block text-xs font-medium text-slate-500 mb-1">{PERSONNEL_LABELS[key]}</span>
+                          <span className="block text-lg font-bold text-slate-800">{val}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )})}
           </div>
