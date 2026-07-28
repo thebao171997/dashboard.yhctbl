@@ -537,6 +537,8 @@ app.post("/api/targets", requireAuth, async (req, res) => {
 });
 
 // --- Server Setup --- //
+export default app;
+
 async function startServer() {
   await initDb();
   
@@ -547,11 +549,12 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.join(process.cwd(), "dist")));
-    // Express 5.x uses * instead of *all or whatever, but actually Express 5.x standardizes wildcards. Let's use * 
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(process.cwd(), "dist", "index.html"));
-    });
+    if (!process.env.VERCEL) {
+      app.use(express.static(path.join(process.cwd(), "dist")));
+      app.get("*", (req, res) => {
+        res.sendFile(path.join(process.cwd(), "dist", "index.html"));
+      });
+    }
   }
 
   app.listen(PORT, "0.0.0.0", () => {
@@ -559,4 +562,6 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
