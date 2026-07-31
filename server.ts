@@ -390,7 +390,10 @@ app.delete("/api/records/:id", requireAuth, async (req, res) => {
 // Dashboard Data
 app.get("/api/dashboard", async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
+    let minDateStr = req.query.startDate as string;
+    let maxDateStr = req.query.endDate as string;
+    let periodDays = 1;
+
     let recordsQuery = `
       SELECT 
         r.id, r.dept_id, r.start_date, r.end_date, d.name as dept_name, d.type as dept_type, d.planned_beds,
@@ -399,26 +402,26 @@ app.get("/api/dashboard", async (req, res) => {
       JOIN departments d ON r.dept_id = d.id
       JOIN record_data rd ON r.id = rd.record_id
     `;
-    let periodDays = 1;
-    if (startDate && endDate) {
-      const start = new Date(startDate as string);
-      const end = new Date(endDate as string);
-      periodDays = Math.max(1, Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1);
-    } else {
-      const now = new Date();
-      const start = new Date(now.getFullYear(), 0, 1);
-      periodDays = Math.max(1, Math.round((now.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1);
+
+    if (!minDateStr || !maxDateStr) {
+      const maxDateRes = await db.execute("SELECT MAX(end_date) as max_date FROM records");
+      if (maxDateRes.rows.length > 0 && maxDateRes.rows[0].max_date) {
+        maxDateStr = maxDateRes.rows[0].max_date as string;
+        const year = maxDateStr.substring(0, 4);
+        minDateStr = `${year}-01-01`;
+      } else {
+        const currentYear = new Date().getFullYear().toString();
+        minDateStr = `${currentYear}-01-01`;
+        maxDateStr = `${currentYear}-12-31`;
+      }
     }
 
-    const params: string[] = [];
-    if (startDate && endDate) {
-      recordsQuery += ` WHERE r.start_date >= ? AND r.end_date <= ?`;
-      params.push(startDate as string, endDate as string);
-    } else {
-      const currentYear = new Date().getFullYear().toString();
-      recordsQuery += ` WHERE strftime('%Y', r.start_date) = ?`;
-      params.push(currentYear);
-    }
+    const start = new Date(minDateStr);
+    const end = new Date(maxDateStr);
+    periodDays = Math.max(1, Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1);
+
+    const params: string[] = [minDateStr, maxDateStr];
+    recordsQuery += ` WHERE r.start_date >= ? AND r.end_date <= ?`;
 
     // Get all records data joined with department info
     const recordsRes = await db.execute({ sql: recordsQuery, args: params });
@@ -489,7 +492,12 @@ app.get("/api/dashboard", async (req, res) => {
       target_value: row.target_value as number
     }));
 
-    res.json({ data, targets });
+    res.json({
+      data,
+      targets,
+      effectiveStartDate: minDateStr,
+      effectiveEndDate: maxDateStr
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Database error" });

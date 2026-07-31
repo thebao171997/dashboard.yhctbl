@@ -22,6 +22,7 @@ export default function Dashboard() {
   
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [effectiveDates, setEffectiveDates] = useState<{start: string, end: string} | null>(null);
 
   const fetchDashboardData = () => {
     setLoading(true);
@@ -34,12 +35,20 @@ export default function Dashboard() {
       .then(res => {
         setData(res.data || []);
         setTargets(res.targets || []);
+        if (res.effectiveStartDate && res.effectiveEndDate) {
+          setEffectiveDates({ start: res.effectiveStartDate, end: res.effectiveEndDate });
+        } else {
+          setEffectiveDates(null);
+        }
         
         let prevStart = '';
         let prevEnd = '';
         if (startDate && endDate) {
           prevStart = startDate.replace(/^\d{4}/, String(parseInt(startDate.slice(0, 4)) - 1));
           prevEnd = endDate.replace(/^\d{4}/, String(parseInt(endDate.slice(0, 4)) - 1));
+        } else if (res.effectiveStartDate && res.effectiveEndDate) {
+          prevStart = res.effectiveStartDate.replace(/^\d{4}/, String(parseInt(res.effectiveStartDate.slice(0, 4)) - 1));
+          prevEnd = res.effectiveEndDate.replace(/^\d{4}/, String(parseInt(res.effectiveEndDate.slice(0, 4)) - 1));
         } else {
           const now = new Date();
           const prevYear = now.getFullYear() - 1;
@@ -336,6 +345,11 @@ export default function Dashboard() {
             <Download size={16} /> Xuất báo cáo
           </button>
         </div>
+        {effectiveDates && (
+          <div className="mt-3 text-sm text-slate-500 italic">
+            Số liệu thống kê từ ngày {format(new Date(effectiveDates.start), 'dd/MM/yyyy')} đến ngày {format(new Date(effectiveDates.end), 'dd/MM/yyyy')}
+          </div>
+        )}
       </div>
 
       {data.length === 0 && !loading && (
