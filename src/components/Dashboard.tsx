@@ -241,20 +241,72 @@ export default function Dashboard() {
   // Format currency
   const formatVND = (val: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
 
-  const exportExcel = (exportType: 'total' | 'dept' | 'both') => {
-    const wb = XLSX.utils.book_new();
+  const exportExcel = async (exportType: 'total' | 'dept' | 'both') => {
+    const ExcelJS = (await import('exceljs')).default || (await import('exceljs'));
+    const { saveAs } = (await import('file-saver')).default || (await import('file-saver'));
+    
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'Hệ thống Quản lý Bệnh viện';
+    wb.created = new Date();
+
+    const formatExcelNum = (val: number | null | undefined): number | string => {
+       if (val === null || val === undefined) return '-';
+       return Number.isInteger(val) ? val : Number(val.toFixed(1));
+    };
+
+    const styleHeader = (cell: any) => {
+       cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0284C7' } }; // cyan-600
+       cell.border = {
+         top: { style: 'thin' }, left: { style: 'thin' },
+         bottom: { style: 'thin' }, right: { style: 'thin' }
+       };
+       cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    };
+
+    const styleCell = (cell: any) => {
+       cell.border = {
+         top: { style: 'thin' }, left: { style: 'thin' },
+         bottom: { style: 'thin' }, right: { style: 'thin' }
+       };
+    };
+
+    const applyTableStyle = (ws: any, startRow: number, rowCount: number, colCount: number) => {
+       // Header row
+       for (let c = 1; c <= colCount; c++) {
+          styleHeader(ws.getCell(startRow, c));
+       }
+       // Data rows
+       for (let r = startRow + 1; r < startRow + rowCount; r++) {
+          for (let c = 1; c <= colCount; c++) {
+             styleCell(ws.getCell(r, c));
+          }
+       }
+    };
 
     // 1. Sheet Toàn viện
     if (exportType === 'total' || exportType === 'both') {
-      const totalData: any[] = [];
+      const ws = wb.addWorksheet('Toàn Viện');
       
-      totalData.push(['BÁO CÁO TỔNG HỢP TOÀN VIỆN']);
-      totalData.push([`Từ ngày: ${startDate || 'Đầu năm'}`, `Đến ngày: ${endDate || 'Hiện tại'}`]);
-      totalData.push([]);
+      ws.columns = [
+        { header: '', key: 'col1', width: 35 },
+        { header: '', key: 'col2', width: 15 },
+        { header: '', key: 'col3', width: 15 },
+        { header: '', key: 'col4', width: 15 },
+        { header: '', key: 'col5', width: 15 },
+        { header: '', key: 'col6', width: 20 },
+      ];
 
-      totalData.push(['CHUYÊN MÔN Y TẾ']);
-      totalData.push(['Chỉ tiêu', 'Thực hiện', 'Kế hoạch', '% KH', 'Cùng kỳ', 'So với cùng kỳ']);
+      ws.addRow(['BÁO CÁO TỔNG HỢP TOÀN VIỆN']).font = { bold: true, size: 14 };
+      ws.addRow([`Từ ngày: ${startDate || 'Đầu năm'}`, `Đến ngày: ${endDate || 'Hiện tại'}`]).font = { italic: true };
+      ws.addRow([]);
+
+      ws.addRow(['CHUYÊN MÔN Y TẾ']).font = { bold: true, size: 12 };
       
+      const headerRow1 = ws.addRow(['Chỉ tiêu', 'Thực hiện', 'Kế hoạch', '% KH', 'Cùng kỳ', 'So với cùng kỳ']);
+      const table1Start = headerRow1.number;
+      let table1Rows = 1;
+
       Object.entries(METRIC_LABELS).forEach(([key, label]) => {
          const targetObj = currentTargets.find(t => t.metric_key === key);
          const targetVal = targetObj ? targetObj.target_value : null;
@@ -271,44 +323,62 @@ export default function Dashboard() {
 
          let yoyDiff = actualVal - prevVal;
          
-         totalData.push([
+         ws.addRow([
            label,
-           actualVal,
-           targetVal || '-',
-           percent,
-           prevVal,
-           yoyDiff
+           formatExcelNum(actualVal),
+           formatExcelNum(targetVal),
+           percent !== '-' ? (percent as number).toFixed(1) + '%' : '-',
+           formatExcelNum(prevVal),
+           yoyDiff > 0 ? `+${formatExcelNum(yoyDiff)}` : formatExcelNum(yoyDiff)
          ]);
+         table1Rows++;
       });
+      applyTableStyle(ws, table1Start, table1Rows, 6);
 
-      totalData.push([]);
-      totalData.push(['NHÂN LỰC TOÀN VIỆN']);
-      totalData.push(['Chức danh', 'Số lượng']);
+      ws.addRow([]);
+      ws.addRow(['NHÂN LỰC TOÀN VIỆN']).font = { bold: true, size: 12 };
+      const headerRow2 = ws.addRow(['Chức danh', 'Số lượng']);
+      const table2Start = headerRow2.number;
+      let table2Rows = 1;
       
       PERSONNEL_GROUPS.forEach(group => {
-         totalData.push([group.title.toUpperCase(), '']);
+         const groupTotal = group.keys.reduce((sum, key) => sum + (totalPersonnel[key] || 0), 0);
+         const r = ws.addRow([group.title.toUpperCase(), groupTotal]);
+         r.font = { bold: true };
+         table2Rows++;
+         
          group.keys.forEach(key => {
             if (totalPersonnel[key]) {
-               totalData.push([PERSONNEL_LABELS[key], totalPersonnel[key]]);
+               ws.addRow(['  ' + PERSONNEL_LABELS[key], totalPersonnel[key]]);
+               table2Rows++;
             }
          });
       });
-
-      const wsTotal = XLSX.utils.aoa_to_sheet(totalData);
-      XLSX.utils.book_append_sheet(wb, wsTotal, "Toàn Viện");
+      applyTableStyle(ws, table2Start, table2Rows, 2);
     }
 
     // 2. Sheet Từng khoa
     if (exportType === 'dept' || exportType === 'both') {
       data.forEach(dept => {
-        const deptData: any[] = [];
-        deptData.push([`BÁO CÁO KHOA/PHÒNG: ${dept.name.toUpperCase()}`]);
-        deptData.push([`Từ ngày: ${startDate || 'Đầu năm'}`, `Đến ngày: ${endDate || 'Hiện tại'}`]);
-        deptData.push([]);
+        let safeName = dept.name.replace(/[\[\]\*\\\/\?]/g, "").substring(0, 31);
+        const ws = wb.addWorksheet(safeName);
+
+        ws.columns = [
+          { header: '', key: 'col1', width: 35 },
+          { header: '', key: 'col2', width: 15 },
+          { header: '', key: 'col3', width: 15 },
+          { header: '', key: 'col4', width: 20 },
+        ];
+
+        ws.addRow([`BÁO CÁO KHOA/PHÒNG: ${dept.name.toUpperCase()}`]).font = { bold: true, size: 14 };
+        ws.addRow([`Từ ngày: ${startDate || 'Đầu năm'}`, `Đến ngày: ${endDate || 'Hiện tại'}`]).font = { italic: true };
+        ws.addRow([]);
 
         if (dept.type !== 4) { // Chuyên môn
-          deptData.push(['CHUYÊN MÔN Y TẾ']);
-          deptData.push(['Chỉ tiêu', 'Thực hiện', 'Cùng kỳ', 'So với cùng kỳ']);
+          ws.addRow(['CHUYÊN MÔN Y TẾ']).font = { bold: true, size: 12 };
+          const headerRow = ws.addRow(['Chỉ tiêu', 'Thực hiện', 'Cùng kỳ', 'So với cùng kỳ']);
+          const table1Start = headerRow.number;
+          let table1Rows = 1;
           
           const prevDept = prevData.find(d => d.id === dept.id);
           
@@ -317,37 +387,45 @@ export default function Dashboard() {
              const prevVal = prevDept ? (prevDept.metrics[key] as number || 0) : 0;
              const diff = (val as number) - prevVal;
              
-             deptData.push([
+             ws.addRow([
                METRIC_LABELS[key as keyof typeof METRIC_LABELS] || key,
-               val,
-               prevVal,
-               diff
+               formatExcelNum(val as number),
+               formatExcelNum(prevVal),
+               diff > 0 ? `+${formatExcelNum(diff)}` : formatExcelNum(diff)
              ]);
+             table1Rows++;
           });
-          deptData.push([]);
+          applyTableStyle(ws, table1Start, table1Rows, 4);
+          ws.addRow([]);
         }
 
-        deptData.push(['NHÂN LỰC']);
-        deptData.push(['Chức danh', 'Số lượng']);
+        ws.addRow(['NHÂN LỰC']).font = { bold: true, size: 12 };
+        const headerRow2 = ws.addRow(['Chức danh', 'Số lượng']);
+        const table2Start = headerRow2.number;
+        let table2Rows = 1;
+
         if (dept.personnel) {
            PERSONNEL_GROUPS.forEach(group => {
               const keys = group.keys.filter(k => dept.personnel![k]);
               if (keys.length > 0) {
-                 deptData.push([group.title.toUpperCase(), '']);
+                 const groupTotal = keys.reduce((sum, key) => sum + (dept.personnel![key] as number), 0);
+                 const r = ws.addRow([group.title.toUpperCase(), groupTotal]);
+                 r.font = { bold: true };
+                 table2Rows++;
                  keys.forEach(key => {
-                    deptData.push([PERSONNEL_LABELS[key], dept.personnel![key]]);
+                    ws.addRow(['  ' + PERSONNEL_LABELS[key], dept.personnel![key]]);
+                    table2Rows++;
                  });
               }
            });
         }
-
-        const wsDept = XLSX.utils.aoa_to_sheet(deptData);
-        let safeName = dept.name.replace(/[\[\]\*\\\/\?]/g, "").substring(0, 31);
-        XLSX.utils.book_append_sheet(wb, wsDept, safeName);
+        applyTableStyle(ws, table2Start, table2Rows, 2);
       });
     }
 
-    XLSX.writeFile(wb, `BaoCao_${startDate || 'DauNam'}_${endDate || 'HienTai'}.xlsx`);
+    const buffer = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, `BaoCao_${startDate || 'DauNam'}_${endDate || 'HienTai'}.xlsx`);
     setShowExportModal(false);
   };
 
