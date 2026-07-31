@@ -552,7 +552,7 @@ export default function Dashboard() {
         <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-3 mb-6">
             <Trophy className="text-amber-500" />
-            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Xếp hạng Công suất Giường bệnh</h3>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Xếp hạng Công suất sử dụng giường bệnh</h3>
           </div>
           <div style={{ height: Math.max(288, rankCSSDGB.length * 40 + 40) }}>
             <ResponsiveContainer width="100%" height="100%">
