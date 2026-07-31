@@ -14,11 +14,19 @@ function AppContent() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   const isAdmin = userCtx?.user?.role === 'admin';
+
+  useEffect(() => {
+    if (isAdmin) {
+      setSidebarOpen(true);
+    } else {
+      setSidebarOpen(false);
+    }
+  }, [isAdmin]);
 
   useEffect(() => {
     if (theme === 'dark') {
