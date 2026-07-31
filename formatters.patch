@@ -1,0 +1,64 @@
+--- src/components/Dashboard.tsx
++++ src/components/Dashboard.tsx
+@@ -479,7 +479,8 @@
+                   <XAxis dataKey="name" tick={{fill: '#64748b', fontSize: 12}} angle={-45} textAnchor="end" axisLine={false} tickLine={false} />
+                   <YAxis tick={{fill: '#64748b', fontSize: 13}} axisLine={false} tickLine={false} />
+                   <Tooltip 
++                    formatter={(val: number) => Number.isInteger(val) ? val : Number(val.toFixed(1))}
+                     cursor={{fill: '#f8fafc'}}
+                     contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                   />
+                   <Legend wrapperStyle={{paddingTop: '20px'}} />
+@@ -505,7 +506,8 @@
+                   <XAxis dataKey="name" tick={{fill: '#64748b', fontSize: 12}} angle={-45} textAnchor="end" axisLine={false} tickLine={false} />
+                   <YAxis tick={{fill: '#64748b', fontSize: 13}} axisLine={false} tickLine={false} />
+                   <Tooltip 
++                    formatter={(val: number) => Number.isInteger(val) ? val : Number(val.toFixed(1))}
+                     cursor={{fill: '#f8fafc'}}
+                     contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                   />
+                   <Legend wrapperStyle={{paddingTop: '20px'}} />
+@@ -553,18 +555,19 @@
+             <Trophy className="text-amber-500" />
+             <h3 className="text-lg font-bold text-slate-800">Xếp hạng Công suất Giường bệnh</h3>
+           </div>
+-          <div className="h-72">
++          <div style={{ height: Math.max(288, rankCSSDGB.length * 40 + 40) }}>
+             <ResponsiveContainer width="100%" height="100%">
+-              <BarChart data={rankCSSDGB.slice(0, 5)} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
++              <BarChart data={rankCSSDGB} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
+                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                 <XAxis type="number" unit="%" tick={{fill: '#64748b'}} axisLine={false} tickLine={false} />
+                 <YAxis dataKey="name" type="category" width={200} axisLine={false} tickLine={false} tick={<CustomYAxisTick />} />
+                 <Tooltip 
++                  formatter={(val: number) => Number.isInteger(val) ? val : Number(val.toFixed(1))}
+                   cursor={{fill: '#f8fafc'}}
+                   contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                 />
+                 <Bar dataKey="metrics.cssdgb" name="CSSDGB" radius={[0, 6, 6, 0]}>
+-                  {rankCSSDGB.slice(0, 5).map((entry, index) => (
++                  {rankCSSDGB.map((entry, index) => (
+                     <Cell key={`cell-${index}`} fill={index === 0 ? '#10b981' : '#94a3b8'} />
+                   ))}
+                 </Bar>
+@@ -579,9 +582,9 @@
+             <Trophy className="text-amber-500" />
+             <h3 className="text-lg font-bold text-slate-800">Top Doanh thu DVKT theo yêu cầu</h3>
+           </div>
+-          <div className="h-72">
++          <div style={{ height: Math.max(288, rankRevenue.length * 40 + 40) }}>
+             <ResponsiveContainer width="100%" height="100%">
+-              <BarChart data={rankRevenue.slice(0, 5)} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
++              <BarChart data={rankRevenue} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
+                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                 <XAxis type="number" tickFormatter={(v) => (v/1000000) + 'M'} tick={{fill: '#64748b'}} axisLine={false} tickLine={false} />
+                 <YAxis dataKey="name" type="category" width={200} axisLine={false} tickLine={false} tick={<CustomYAxisTick />} />
+@@ -591,7 +594,7 @@
+                   contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                 />
+                 <Bar dataKey="metrics.tien_dvkt_yeu_cau" name="Doanh thu" radius={[0, 6, 6, 0]}>
+-                  {rankRevenue.slice(0, 5).map((entry, index) => (
++                  {rankRevenue.map((entry, index) => (
+                     <Cell key={`cell-${index}`} fill={index === 0 ? '#f59e0b' : '#94a3b8'} />
+                   ))}
+                 </Bar>

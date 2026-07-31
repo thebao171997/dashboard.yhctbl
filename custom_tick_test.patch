@@ -1,0 +1,33 @@
+--- src/components/Dashboard.tsx
++++ src/components/Dashboard.tsx
+@@ -9,6 +9,28 @@
+ import { format } from 'date-fns';
+ 
++const CustomYAxisTick = (props: any) => {
++  const { x, y, payload, index } = props;
++  
++  let medal = '';
++  let animationClass = '';
++  if (index === 0) {
++    medal = '🥇';
++    animationClass = 'animate-bounce drop-shadow-md inline-block';
++  } else if (index === 1) {
++    medal = '🥈';
++  } else if (index === 2) {
++    medal = '🥉';
++  }
++
++  return (
++    <g transform={`translate(${x},${y})`}>
++      <foreignObject x={-160} y={-12} width={160} height={24}>
++        <div className="flex items-center justify-end w-full h-full pr-2 text-[13px] text-slate-600 font-medium">
++          {medal && <span className={`mr-1.5 text-lg ${animationClass}`} style={index === 0 ? { animationDuration: '2s' } : {}}>{medal}</span>}
++          <span className="truncate">{payload.value}</span>
++        </div>
++      </foreignObject>
++    </g>
++  );
++};
++
+ export default function Dashboard() {
+   const [data, setData] = useState<DashboardDeptData[]>([]);

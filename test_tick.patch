@@ -1,0 +1,18 @@
+--- src/components/Dashboard.tsx
++++ src/components/Dashboard.tsx
+@@ -25,10 +25,12 @@
+   return (
+     <g transform={`translate(${x},${y})`}>
+       <foreignObject x={-160} y={-14} width={160} height={28}>
+-        <div className="flex items-center justify-end w-full h-full pr-2 text-[13px] text-slate-600 font-medium">
+-          {medal && <span className={`mr-1.5 text-lg leading-none ${animationClass}`}>{medal}</span>}
+-          <span className="truncate leading-none pt-0.5">{payload.value}</span>
++        <div className="flex items-center justify-end w-full h-full pr-8 relative text-[13px] text-slate-600 font-medium">
++          <span className="truncate pt-0.5">{payload.value}</span>
++          <div className="absolute right-2 top-0 bottom-0 flex items-center justify-center w-5">
++            {medal && <span className={`text-lg leading-none ${animationClass}`}>{medal}</span>}
++          </div>
+         </div>
+       </foreignObject>
+     </g>
+   );

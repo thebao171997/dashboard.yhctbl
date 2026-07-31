@@ -242,32 +242,32 @@ export default function DataEntry() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-slate-200 dark:border-slate-700">
         <button
           onClick={() => setActiveTab('department')}
-          className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${activeTab === 'department' ? 'border-cyan-600 text-cyan-700' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${activeTab === 'department' ? 'border-cyan-600 text-cyan-700' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'}`}
         >
           Nhập Báo Cáo Khoa
         </button>
         <button
           onClick={() => setActiveTab('target')}
-          className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${activeTab === 'target' ? 'border-cyan-600 text-cyan-700' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${activeTab === 'target' ? 'border-cyan-600 text-cyan-700' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'}`}
         >
           Kế Hoạch Toàn Viện
         </button>
       </div>
 
       {activeTab === 'department' && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <h3 className="text-xl font-bold text-slate-800 mb-6">Nhập & Chỉnh sửa Số Liệu Báo Cáo</h3>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+          <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-6">Nhập & Chỉnh sửa Số Liệu Báo Cáo</h3>
         
         <div className={`grid grid-cols-1 gap-6 mb-8 items-end ${periodType === 'custom' ? 'lg:grid-cols-4 md:grid-cols-2' : 'md:grid-cols-3'}`}>
           <div className={`${periodType === 'custom' ? 'lg:col-span-1' : ''}`}>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Chọn khoa</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Chọn khoa</label>
             <select
               value={selectedDeptId}
               onChange={e => setSelectedDeptId(e.target.value ? Number(e.target.value) : '')}
-              className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
               <option value="">-- Chọn khoa --</option>
               {departments.map(d => (
@@ -277,7 +277,7 @@ export default function DataEntry() {
           </div>
           
           <div className={`${periodType === 'custom' ? 'lg:col-span-1' : ''}`}>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Kỳ báo cáo</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Kỳ báo cáo</label>
             <select
               value={periodType}
               onChange={e => {
@@ -295,7 +295,7 @@ export default function DataEntry() {
                   setDateStr(`${y}-Q${q}`);
                 }
               }}
-              className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
               <option value="week">Theo Tuần</option>
               <option value="month">Theo Tháng</option>
@@ -308,7 +308,7 @@ export default function DataEntry() {
             {periodType === 'custom' ? (
               <div className="flex gap-3">
                 <div className="flex-1">
-                   <label className="block text-xs font-medium text-slate-500 mb-1">Từ ngày</label>
+                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Từ ngày</label>
                    <DatePicker
                      selected={customStart ? new Date(customStart) : null}
                      onChange={(date: Date | null) => setCustomStart(date ? format(date, 'yyyy-MM-dd') : '')}
@@ -316,12 +316,12 @@ export default function DataEntry() {
                      showYearDropdown
                      showMonthDropdown
                      dropdownMode="select"
-                     className="w-full border border-slate-200 rounded-xl px-2 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
+                     className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
                      placeholderText="dd/mm/yyyy"
                    />
                 </div>
                 <div className="flex-1">
-                   <label className="block text-xs font-medium text-slate-500 mb-1">Đến ngày</label>
+                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Đến ngày</label>
                    <DatePicker
                      selected={customEnd ? new Date(customEnd) : null}
                      onChange={(date: Date | null) => setCustomEnd(date ? format(date, 'yyyy-MM-dd') : '')}
@@ -329,14 +329,14 @@ export default function DataEntry() {
                      showYearDropdown
                      showMonthDropdown
                      dropdownMode="select"
-                     className="w-full border border-slate-200 rounded-xl px-2 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
+                     className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
                      placeholderText="dd/mm/yyyy"
                    />
                 </div>
               </div>
             ) : (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Chọn thời gian</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Chọn thời gian</label>
                 {periodType === 'month' && (
                   <div className="flex gap-2">
                     <select 
@@ -346,7 +346,7 @@ export default function DataEntry() {
                         const month = e.target.value.toString().padStart(2, '0');
                         setDateStr(`${year}-${month}`);
                       }}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     >
                       {Array.from({ length: 12 }).map((_, i) => (
                         <option key={i + 1} value={(i + 1).toString().padStart(2, '0')}>Tháng {i + 1}</option>
@@ -358,7 +358,7 @@ export default function DataEntry() {
                         const month = dateStr.split('-')[1] || (new Date().getMonth() + 1).toString().padStart(2, '0');
                         setDateStr(`${e.target.value}-${month}`);
                       }}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     >
                       {Array.from({ length: 10 }).map((_, i) => {
                         const year = new Date().getFullYear() - 5 + i;
@@ -368,7 +368,7 @@ export default function DataEntry() {
                   </div>
                 )}
                 {periodType === 'week' && (
-                  <input type="week" value={dateStr} onChange={e => setDateStr(e.target.value)} className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+                  <input type="week" value={dateStr} onChange={e => setDateStr(e.target.value)} className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                 )}
                 {periodType === 'quarter' && (
                   <div className="flex gap-2">
@@ -378,7 +378,7 @@ export default function DataEntry() {
                         const year = dateStr.split('-')[0] || new Date().getFullYear();
                         setDateStr(`${year}-${e.target.value}`);
                       }}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     >
                       <option value="Q1">Quý 1</option>
                       <option value="Q2">Quý 2</option>
@@ -391,7 +391,7 @@ export default function DataEntry() {
                         const quarter = dateStr.split('-')[1] || 'Q1';
                         setDateStr(`${e.target.value}-${quarter}`);
                       }}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     >
                       {Array.from({ length: 10 }).map((_, i) => {
                         const year = new Date().getFullYear() - 5 + i;
@@ -408,8 +408,8 @@ export default function DataEntry() {
         {selectedDept ? (
           <div className="space-y-6">
             <div className="flex items-center justify-between border-b pb-2">
-              <h4 className="font-semibold text-slate-700 flex items-center gap-2">
-                {existingRecordId ? <Edit3 size={18} className="text-cyan-600" /> : <Save size={18} className="text-slate-400" />}
+              <h4 className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                {existingRecordId ? <Edit3 size={18} className="text-cyan-600 dark:text-cyan-400" /> : <Save size={18} className="text-slate-400" />}
                 {existingRecordId ? 'Chỉnh sửa số liệu đã nhập' : 'Nhập số liệu mới'}
               </h4>
               {checking && <span className="text-sm text-slate-400 italic">Đang tải...</span>}
@@ -420,7 +420,7 @@ export default function DataEntry() {
                 const groupMetrics = group.keys.filter(k => selectedDept.metrics.includes(k));
                 if (groupMetrics.length === 0) return null;
                 return (
-                  <div key={group.title} className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                  <div key={group.title} className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
                     <h5 className="text-sm font-semibold text-slate-600 mb-4 uppercase tracking-wider">{group.title}</h5>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {groupMetrics.map(key => (
@@ -432,7 +432,7 @@ export default function DataEntry() {
                             step="any"
                             value={data[key] || ''}
                             onChange={e => setData({...data, [key]: e.target.value})}
-                            className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                            className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                             placeholder="Nhập số..."
                           />
                         </div>
@@ -448,7 +448,7 @@ export default function DataEntry() {
                 <button
                   onClick={() => setShowDeleteModal(true)}
                   disabled={saving || checking || deleting}
-                  className="flex items-center gap-2 px-6 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-medium transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-6 py-3 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-xl font-medium transition-colors disabled:opacity-50"
                 >
                   <Trash2 size={20} /> Xóa dữ liệu
                 </button>
@@ -464,7 +464,7 @@ export default function DataEntry() {
             </div>
           </div>
         ) : (
-          <div className="py-12 text-center text-slate-400 bg-slate-50 rounded-xl border border-slate-100 border-dashed">
+          <div className="py-12 text-center text-slate-400 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-700 border-dashed">
             Vui lòng chọn khoa và thời gian để bắt đầu nhập liệu
           </div>
         )}
@@ -472,22 +472,22 @@ export default function DataEntry() {
       )}
 
       {activeTab === 'department' && selectedDeptId && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mt-6">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 mt-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-slate-800">Danh sách các kỳ đã nhập liệu</h3>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Danh sách các kỳ đã nhập liệu</h3>
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-slate-700">Lọc theo năm:</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Lọc theo năm:</label>
               <input 
                 type="number" 
                 value={historyYear} 
                 onChange={e => setHistoryYear(e.target.value === '' ? '' : Number(e.target.value))} 
-                className="w-24 border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm" 
+                className="w-24 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm" 
               />
             </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-200">
+              <thead className="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 font-medium border-b border-slate-200 dark:border-slate-700">
                 <tr>
                   <th className="px-4 py-3">Loại kỳ</th>
                   <th className="px-4 py-3">Thời gian</th>
@@ -499,14 +499,14 @@ export default function DataEntry() {
               <tbody className="divide-y divide-slate-100">
                 {recordHistory.length > 0 ? (
                   recordHistory.map(record => (
-                  <tr key={record.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={record.id} className="hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
                     <td className="px-4 py-3">
                       {record.period_type === 'month' && 'Tháng'}
                       {record.period_type === 'quarter' && 'Quý'}
                       {record.period_type === 'week' && 'Tuần'}
                       {record.period_type === 'custom' && 'Tùy chọn'}
                     </td>
-                    <td className="px-4 py-3 font-medium text-slate-800">
+                    <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-100">
                       {record.period_type === 'custom' ? 'Tùy chọn' : record.period_value}
                     </td>
                     <td className="px-4 py-3">{format(parseISO(record.start_date), 'dd/MM/yyyy')}</td>
@@ -523,7 +523,7 @@ export default function DataEntry() {
                           }
                           document.getElementById('main-content')?.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
-                        className="text-cyan-600 hover:text-cyan-700 font-medium px-3 py-1 bg-cyan-50 hover:bg-cyan-100 rounded-lg transition-colors"
+                        className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 font-medium px-3 py-1 bg-cyan-50 dark:bg-cyan-900/30 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 rounded-lg transition-colors"
                       >
                         Xem/Sửa
                       </button>
@@ -532,7 +532,7 @@ export default function DataEntry() {
                 ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
                       Chưa có dữ liệu trong năm này
                     </td>
                   </tr>
@@ -544,23 +544,23 @@ export default function DataEntry() {
       )}
 
       {activeTab === 'target' && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-slate-800">Nhập Kế Hoạch Năm Toàn Viện</h3>
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">Nhập Kế Hoạch Năm Toàn Viện</h3>
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-slate-700">Năm:</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Năm:</label>
               <input 
                 type="number" 
                 value={targetYear} 
                 onChange={e => setTargetYear(Number(e.target.value))} 
-                className="w-24 border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500" 
+                className="w-24 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500" 
               />
             </div>
           </div>
           
           <div className="space-y-6">
             {METRIC_GROUPS.map(group => (
-              <div key={group.title} className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <div key={group.title} className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
                 <h5 className="text-sm font-semibold text-slate-600 mb-4 uppercase tracking-wider">{group.title}</h5>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {group.keys.map(key => {
@@ -574,7 +574,7 @@ export default function DataEntry() {
                           step="any"
                           value={targetData[key] || ''}
                           onChange={e => setTargetData({...targetData, [key]: e.target.value})}
-                          className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                          className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                           placeholder="Nhập chỉ tiêu..."
                         />
                       </div>
@@ -611,17 +611,17 @@ export default function DataEntry() {
       {/* Overlap Modal */}
       {showOverlapModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="p-6">
               <div className="flex items-center gap-3 text-amber-500 mb-4">
                 <AlertTriangle size={28} />
-                <h3 className="text-xl font-bold text-slate-800">Cảnh báo Trùng lặp</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">Cảnh báo Trùng lặp</h3>
               </div>
               <p className="text-slate-600 mb-4">
                 Đã có dữ liệu trong khoảng thời gian bị trùng lặp với kỳ báo cáo bạn vừa chọn.
               </p>
               {overlapDates.length > 0 && (
-                <div className="mb-4 p-3 bg-amber-50 rounded-xl border border-amber-100 text-sm text-amber-800">
+                <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/30 rounded-xl border border-amber-100 dark:border-amber-900/50 text-sm text-amber-800 dark:text-amber-400">
                   <p className="font-semibold mb-1">Các khoảng thời gian trùng lặp:</p>
                   <ul className="list-disc pl-5 space-y-1">
                     {overlapDates.map((d, i) => (
@@ -650,7 +650,7 @@ export default function DataEntry() {
                 </button>
                 <button 
                   onClick={() => { setShowOverlapModal(false); handleSave(true); }}
-                  className="px-5 py-2.5 rounded-xl font-medium text-white bg-amber-500 hover:bg-amber-600 transition-colors shadow-sm"
+                  className="px-5 py-2.5 rounded-xl font-medium text-white bg-amber-50 dark:bg-amber-900/300 hover:bg-amber-600 transition-colors shadow-sm"
                 >
                   Thay thế dữ liệu
                 </button>
@@ -663,11 +663,11 @@ export default function DataEntry() {
       {/* Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="p-6">
               <div className="flex items-center gap-3 text-red-500 mb-4">
                 <Trash2 size={28} />
-                <h3 className="text-xl font-bold text-slate-800">Xác nhận Xóa</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">Xác nhận Xóa</h3>
               </div>
               <p className="text-slate-600 mb-6">
                 Bạn có chắc chắn muốn xóa hoàn toàn dữ liệu của kỳ báo cáo này khỏi hệ thống? 
@@ -683,7 +683,7 @@ export default function DataEntry() {
                 <button 
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white bg-red-500 hover:bg-red-600 transition-colors shadow-sm disabled:opacity-50"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white bg-red-50 dark:bg-red-900/300 hover:bg-red-600 transition-colors shadow-sm disabled:opacity-50"
                 >
                   {deleting ? 'Đang xóa...' : 'Xác nhận xóa'}
                 </button>

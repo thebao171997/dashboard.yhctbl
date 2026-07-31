@@ -3,7 +3,7 @@ import { UserContextType } from './types';
 import Dashboard from './components/Dashboard';
 import DataEntry from './components/DataEntry';
 import ManageDepts from './components/ManageDepts';
-import { LayoutDashboard, PenSquare, Building2, LogOut, Lock, Menu } from 'lucide-react';
+import { LayoutDashboard, PenSquare, Building2, LogOut, Lock, Menu, MapPin, Phone, Mail } from "lucide-react";
 import clsx from 'clsx';
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -16,7 +16,17 @@ function AppContent() {
   const [loginError, setLoginError] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
   const isAdmin = userCtx?.user?.role === 'admin';
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +43,7 @@ function AppContent() {
   };
 
   return (
-    <div className="h-screen bg-slate-100 flex flex-col font-sans text-slate-900 overflow-hidden">
+    <div className="h-screen bg-slate-100 dark:bg-slate-900 flex flex-col font-sans text-slate-900 dark:text-slate-100 overflow-hidden transition-colors">
       {/* Top Header */}
       <header className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0 text-white z-20 shadow-md">
         <div className="flex items-center gap-4">
@@ -48,11 +58,41 @@ function AppContent() {
             <p className="text-xs text-slate-400 mt-0.5">Hệ thống quản lý số liệu</p>
           </div>
         </div>
-        <h2 className="hidden md:block text-sm font-medium text-slate-400 bg-slate-800/50 px-4 py-1.5 rounded-full">
-          {currentTab === 'dashboard' && 'Tổng quan số liệu'}
-          {currentTab === 'entry' && 'Nhập số liệu báo cáo'}
-          {currentTab === 'depts' && 'Quản lý danh mục khoa'}
-        </h2>
+        <div className="flex items-center gap-4">
+          <h2 className="hidden md:block text-sm font-medium text-slate-400 bg-slate-800/50 px-4 py-1.5 rounded-full">
+            {currentTab === 'dashboard' && 'Tổng quan số liệu'}
+            {currentTab === 'entry' && 'Nhập số liệu báo cáo'}
+            {currentTab === 'depts' && 'Quản lý danh mục khoa'}
+          </h2>
+          <div className="flex items-center bg-slate-800 p-1 rounded-full border border-slate-700 shadow-inner">
+            <button
+              onClick={() => setTheme('light')}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                theme === 'light' ? 'bg-white shadow-md' : 'hover:bg-slate-700'
+              }`}
+              title="Giao diện sáng"
+            >
+              <div
+                className={`w-4 h-4 rounded-full ${
+                  theme === 'light' ? 'bg-slate-800' : 'bg-slate-400 border border-slate-500'
+                }`}
+              />
+            </button>
+            <button
+              onClick={() => setTheme('dark')}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                theme === 'dark' ? 'bg-black shadow-md' : 'hover:bg-slate-700'
+              }`}
+              title="Giao diện tối"
+            >
+              <div
+                className={`w-4 h-4 rounded-full ${
+                  theme === 'dark' ? 'bg-slate-300' : 'bg-slate-500 border border-slate-600'
+                }`}
+              />
+            </button>
+          </div>
+        </div>
       </header>
 
       <div className="flex-1 flex overflow-hidden">
@@ -118,10 +158,37 @@ function AppContent() {
         </aside>
 
         {/* Main Content */}
-        <main id="main-content" className="flex-1 overflow-auto p-6 lg:p-8 relative">
-          {currentTab === 'dashboard' && <Dashboard />}
-          {currentTab === 'entry' && isAdmin && <DataEntry />}
-          {currentTab === 'depts' && isAdmin && <ManageDepts />}
+        <main id="main-content" className="flex-1 overflow-auto p-6 lg:p-8 relative flex flex-col">
+          <div className="flex-1">
+            {currentTab === 'dashboard' && <Dashboard />}
+            {currentTab === 'entry' && isAdmin && <DataEntry />}
+            {currentTab === 'depts' && isAdmin && <ManageDepts />}
+          </div>
+          
+          {/* Footer */}
+          <footer className="mt-12 pt-8 pb-4 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center md:items-end justify-between gap-6 text-slate-500 dark:text-slate-400 text-sm shrink-0">
+            <div className="flex flex-col gap-3 text-center md:text-left">
+              <h3 className="font-bold text-slate-700 dark:text-slate-200 text-base uppercase">Bệnh viện Y học cổ truyền Bảo Lộc</h3>
+              <div className="flex items-center justify-center md:justify-start gap-2">
+                <MapPin size={16} className="text-rose-500 shrink-0" />
+                <span>Số 38 Phạm Ngọc Thạch, Phường B'Lao, Tỉnh Lâm Đồng</span>
+              </div>
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2">
+                <div className="flex items-center gap-2">
+                  <Phone size={16} className="text-emerald-500 shrink-0" />
+                  <span>0263.3726544</span>
+                </div>
+                <span className="hidden md:inline text-slate-300 dark:text-slate-600">·</span>
+                <div className="flex items-center gap-2">
+                  <Mail size={16} className="text-cyan-500 shrink-0" />
+                  <span>bvyhctbaoloc@gmail.com</span>
+                </div>
+              </div>
+            </div>
+            <div className="text-center md:text-right mt-4 md:mt-0 font-medium text-slate-400 dark:text-slate-500">
+              © {new Date().getFullYear()} Bệnh viện Y học cổ truyền Bảo Lộc
+            </div>
+          </footer>
         </main>
       </div>
 
