@@ -417,7 +417,7 @@ export default function DataEntry() {
             
             <div className="space-y-6">
               {METRIC_GROUPS.map(group => {
-                const groupMetrics = selectedDept.metrics.filter(k => group.keys.includes(k));
+                const groupMetrics = group.keys.filter(k => selectedDept.metrics.includes(k));
                 if (groupMetrics.length === 0) return null;
                 return (
                   <div key={group.title} className="bg-slate-50 p-4 rounded-xl border border-slate-100">

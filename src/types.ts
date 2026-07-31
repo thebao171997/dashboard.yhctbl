@@ -24,12 +24,12 @@ export type PersonnelKey =
 export const METRIC_LABELS: Record<MetricKey, string> = {
   kham_benh: 'Số lượt khám',
   ho_so_ngoai_tru: 'Số Hồ sơ điều trị ngoại trú',
+  benh_nhan_noi_tru: 'Số lượng bệnh nhân điều trị nội trú',
+  ngay_dieu_tri_noi_tru: 'Số ngày điều trị nội trú',
+  ecg: 'Số lượt ECG',
   sieu_am: 'Số lượt Siêu âm',
   x_quang: 'Số lượt X-quang',
-  ecg: 'Số lượt ECG',
   xet_nghiem: 'Số lượng Xét nghiệm',
-  ngay_dieu_tri_noi_tru: 'Số ngày điều trị nội trú',
-  benh_nhan_noi_tru: 'Số lượng bệnh nhân điều trị nội trú',
   dich_vu_ky_thuat: 'Số lượng dịch vụ kỹ thuật',
   tien_dvkt_yeu_cau: 'Số tiền dịch vụ kỹ thuật theo yêu cầu',
   cssdgb: 'Công suất sử dụng giường bệnh (%)',
@@ -56,8 +56,8 @@ export const METRIC_GROUPS: { title: string; keys: MetricKey[] }[] = [
   {
     title: 'Chuyên môn y tế',
     keys: [
-      'kham_benh', 'ho_so_ngoai_tru', 'sieu_am', 'x_quang', 'ecg', 'xet_nghiem',
-      'ngay_dieu_tri_noi_tru', 'benh_nhan_noi_tru', 'dich_vu_ky_thuat', 'tien_dvkt_yeu_cau'
+      'kham_benh', 'ho_so_ngoai_tru', 'benh_nhan_noi_tru', 'ngay_dieu_tri_noi_tru',
+      'ecg', 'sieu_am', 'x_quang', 'xet_nghiem', 'dich_vu_ky_thuat', 'tien_dvkt_yeu_cau'
     ]
   }
 ];

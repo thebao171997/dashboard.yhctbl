@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { DashboardDeptData, HospitalTarget, METRIC_LABELS, PERSONNEL_GROUPS, PERSONNEL_LABELS, PersonnelKey } from '../types';
+import { DashboardDeptData, HospitalTarget, METRIC_LABELS, PERSONNEL_GROUPS, PERSONNEL_LABELS, PersonnelKey, METRIC_GROUPS } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { Activity, Users, BedDouble, Stethoscope, Trophy, BarChart as BarChartIcon, X, Filter, List, Download, ChevronDown, ChevronUp } from 'lucide-react';
 import * as XLSX from 'xlsx';
@@ -254,7 +254,8 @@ export default function Dashboard() {
           
           const prevDept = prevData.find(d => d.id === dept.id);
           
-          Object.entries(dept.metrics).forEach(([key, val]) => {
+          [...METRIC_GROUPS[0].keys, 'cssdgb', 'ndttb'].filter(k => dept.metrics[k] !== undefined).forEach(key => {
+             const val = dept.metrics[key];
              const prevVal = prevDept ? (prevDept.metrics[key] as number || 0) : 0;
              const diff = (val as number) - prevVal;
              
@@ -796,8 +797,8 @@ export default function Dashboard() {
                     <>
                       <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">Chuyên môn y tế</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                         {Object.entries(selectedDeptForModal.metrics).map(([key, rawVal]) => {
-                            const val = rawVal as number;
+                        {[...METRIC_GROUPS[0].keys, 'cssdgb', 'ndttb'].filter(k => selectedDeptForModal.metrics[k] !== undefined).map(key => {
+                            const val = selectedDeptForModal.metrics[key] as number;
                             
                             const prevDept = prevData.find(d => d.id === selectedDeptForModal.id);
                             let yoyDiff: number | null = null;
